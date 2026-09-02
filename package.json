@@ -1,0 +1,14 @@
+{
+  "name": "lumo-api",
+  "version": "1.1.0",
+  "description": "REST API anonyme pour Lumo (Proton) — chat + vision, sans compte. Serveur local + fonctions Vercel.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.js",
+    "test:vercel": "node test-vercel.mjs"
+  },
+  "engines": { "node": ">=18.17" },
+  "license": "MIT"
+}
