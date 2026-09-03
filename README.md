@@ -80,6 +80,15 @@ GET /api/chat?prompt=décrivez cette photo&image_url=https://exemple.com/photo.j
 > `warning` quand l'image n'a pas été perçue. Coût constaté : ~1 message de
 > quota par requête réussie.
 
+### 📤 Variante POST (images uploadées depuis un site)
+```
+POST /api/chat   Content-Type: application/json
+{ "prompt": "décris cette photo", "uid": "123", "model": "lumo-max",
+  "images": ["data:image/jpeg;base64,…", "https://exemple.com/photo.jpg"] }  // max 4 images
+```
+Utile quand l'image est un upload local (data URL trop longue pour une URL GET).
+Même réponse JSON que le GET (`ok/reply/limits/vision/warning`).
+
 ### 📊 Quota restant d'un uid
 ```
 GET /api/limits?uid=123

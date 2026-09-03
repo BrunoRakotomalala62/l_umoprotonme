@@ -20,11 +20,17 @@ function makeRes() {
   };
 }
 
-async function callHandler(mod, query) {
+async function callHandler(mod, query, { method = 'GET', body = null } = {}) {
   const { default: handler } = await import(mod);
   const qs = new URLSearchParams(query).toString();
   const res = makeRes();
-  await handler({ method: 'GET', url: `/api/x?${qs}` }, res);
+  const req = { method, url: `/api/x?${qs}` };
+  if (method === 'POST') {
+    const payload = typeof body === 'string' ? body : JSON.stringify(body || {});
+    req.body = payload; // IncomingMessage async-iterable simulé
+    req[Symbol.asyncIterator] = async function* () { yield Buffer.from(payload); };
+  }
+  await handler(req, res);
   return { statusCode: res.statusCode, body: res.body };
 }
 
@@ -49,6 +55,19 @@ async function main() {
 
   r = await callHandler('./api/limits.js', { uid: 'v' });
   check('limits -> 200 20/20/20', r.statusCode === 200 && r.body.limits?.max === 20);
+
+  // --- POST JSON ---
+  r = await callHandler('./api/chat.js', {}, { method: 'POST', body: {} });
+  check('POST sans prompt -> 400', r.statusCode === 400, JSON.stringify(r.body?.error?.message));
+
+  r = await callHandler('./api/chat.js', {}, { method: 'POST', body: { prompt: 'hi', images: ['http://127.0.0.1:8899/x.png'] } });
+  check('POST image IP privée bloquée -> 400', r.statusCode === 400, JSON.stringify(r.body?.error?.message));
+
+  r = await callHandler('./api/chat.js', {}, { method: 'POST', body: { prompt: 'hi', images: ['ftp://x/y'] } });
+  check('POST image protocole interdit -> 400', r.statusCode === 400);
+
+  r = await callHandler('./api/chat.js', {}, { method: 'POST', body: { prompt: 'hi', images: ['data:image/png;base64,iVBORw0KGgo='] } });
+  check('POST data:image acceptée', r.statusCode === 200 || r.statusCode === 502, String(r.statusCode) + ' ' + JSON.stringify(r.body?.error || r.body?.vision || '').slice(0, 120));
 
   if (SKIP_CHAT) { console.log('SKIP_CHAT=1 : pas d’appel réel.'); return; }
 
