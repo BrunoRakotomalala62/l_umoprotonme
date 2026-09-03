@@ -96,6 +96,9 @@ const server = http.createServer(async (req, res) => {
           limits: out.remaining,
           rotations: out.rotations,
           ...(imageData ? { vision: { attempts: out.visionAttempts, perceived: !out.blind } } : {}),
+          ...(imageData && out.blind
+            ? { warning: 'Lumo n’a pas perçu l’image (backend multimodal indisponible au moment de l’appel) — réessayez dans quelques secondes.' }
+            : {}),
         });
       }
 

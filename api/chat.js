@@ -81,7 +81,7 @@ export default async function handler(req, res) {
       model,
       reasoning,
       timeoutMs: 45000,
-      visionRetries: imageData ? 1 : 0,
+      visionRetries: imageData ? 3 : 0,
       deadlineMs,
     });
     return json(res, 200, {
@@ -94,6 +94,9 @@ export default async function handler(req, res) {
       // serverless : rotation non applicable (chaque appel = session neuve)
       rotations: 0,
       ...(imageData ? { vision: { attempts: out.visionAttempts, perceived: !out.blind } } : {}),
+      ...(imageData && out.blind
+        ? { warning: 'Lumo n’a pas perçu l’image (backend multimodal indisponible au moment de l’appel) — réessayez dans quelques secondes.' }
+        : {}),
       duration_ms: Date.now() - startedAt,
     });
   } catch (err) {

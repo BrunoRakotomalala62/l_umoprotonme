@@ -74,7 +74,7 @@ GET /api/chat?prompt=décrivez cette photo&image_url=https://exemple.com/photo.j
 > ⚠️ **Vision = backend aléatoire chez Lumo.** Le modèle multimodal est attribué
 > au hasard par requête : une partie des réponses « ne voit pas » l'image
 > (backend texte seul). Le proxy détecte ces réponses et **réessaie
-> automatiquement** (jusqu'à 3 tentatives, dispositions alternées), puis expose
+> automatiquement** (jusqu'à 5 tentatives, dispositions alternées), puis expose
 > `vision: {attempts, perceived}` pour que l'appelant sache si l'image a
 > réellement été vue. Coût constaté : ~1 message de quota par requête réussie.
 
@@ -171,7 +171,7 @@ Tests réels effectués le 2026-09-02 depuis une IP datacenter :
 À 19h00–19h10 la vision en clair (texte+image) fonctionnait parfaitement ;
 à 19h35+ le backend assigné aux sessions anonymes est devenu majoritairement
 non-multimodal (réponses « je ne vois pas l'image »), avec ~1 requête sur 3
-qui voit réellement. La détection + retries du proxy (jusqu'à 3 essais) est la
+qui voit réellement. La détection + retries du proxy (jusqu'à 5 essais) est la
 parade ; le champ `vision.perceived` dit la vérité sur la tentative finale.
 Le mode chiffré E2E (exact comme l'app) présente le même aléa.
 
