@@ -1,0 +1,12 @@
+# Contexte de build : on n'envoie que le nécessaire à Docker/Render.
+node_modules/
+tools/node_modules/
+.git/
+.vercel/
+*.log
+.DS_Store
+test.js
+test-vercel.mjs
+README.md
+api/
+tools/

@@ -1,0 +1,12 @@
+# Render Blueprint (optionnel) — déploiement un-clic depuis le repo GitHub :
+#   1. dashboard.render.com → New → Blueprint → sélectionner le repo
+#   2. Render lit ce fichier et crée le service web "lumo-api"
+# Vérifie automatiquement /health.
+services:
+  - type: web
+    name: lumo-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true

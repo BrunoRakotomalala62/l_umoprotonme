@@ -16,6 +16,25 @@ npm start                 # → http://localhost:3000
 npm test                  # tests de bout en bout
 ```
 
+### A-bis. Déploiement Docker / Render
+Le repo contient un `Dockerfile` (Node 22, zéro dépendance) et un
+`render.yaml` (blueprint optionnel). Render exécute `server.js` en service
+web long-running — **sessions persistantes + rotation de quota + stream SSE
+comme en local** (contrairement au mode serverless Vercel, sans état).
+
+```bash
+# test local de l'image
+docker build -t lumo-api .
+docker run -p 3000:3000 lumo-api
+# → http://localhost:3000/api/chat?prompt=bonjour&uid=1
+```
+
+Sur Render :
+1. `New +` → **Web Service** → connecter le repo GitHub `l_umoprotonme`
+   (ou `New +` → **Blueprint** : `render.yaml` est détecté automatiquement),
+2. Runtime : **Docker** (le Dockerfile est trouvé à la racine),
+3. Render injecte `PORT` tout seul ; la santé est vérifiée sur `/health`.
+
 ### B. Déploiement Vercel (serverless)
 Le dossier contient des fonctions serverless (`api/`) prêtes pour Vercel :
 ```bash
@@ -182,6 +201,8 @@ package.json   `npm start`, `npm test`
 
 ## Fichiers du projet
 - `server.js` — serveur HTTP local (routes complètes, stream SSE)
+- `Dockerfile` — image Docker (Node 22) pour Render / tout hôte Docker
+- `render.yaml` — blueprint Render optionnel (service web `lumo-api`)
 - `api/` — fonctions serverless Vercel (`chat.js`, `limits.js`, `health.js`)
 - `vercel.json` — config Vercel (`maxDuration` 60 s, rewrite `/` → health)
 - `lib/lumo.js` — client cœur (voir plus haut)
