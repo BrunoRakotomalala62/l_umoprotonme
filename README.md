@@ -73,10 +73,12 @@ GET /api/chat?prompt=décrivez cette photo&image_url=https://exemple.com/photo.j
 
 > ⚠️ **Vision = backend aléatoire chez Lumo.** Le modèle multimodal est attribué
 > au hasard par requête : une partie des réponses « ne voit pas » l'image
-> (backend texte seul). Le proxy détecte ces réponses et **réessaie
-> automatiquement** (jusqu'à 5 tentatives, dispositions alternées), puis expose
-> `vision: {attempts, perceived}` pour que l'appelant sache si l'image a
-> réellement été vue. Coût constaté : ~1 message de quota par requête réussie.
+> (backend texte seul). Le proxy ajoute une **consigne système** qui force le
+> modèle aveugle à répondre `NO_IMAGE` (au lieu d'inventer un contenu), détecte
+> ces réponses et **réessaie automatiquement** (jusqu'à 5 tentatives,
+> dispositions alternées). Il expose `vision: {attempts, perceived}` et un
+> `warning` quand l'image n'a pas été perçue. Coût constaté : ~1 message de
+> quota par requête réussie.
 
 ### 📊 Quota restant d'un uid
 ```
